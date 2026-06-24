@@ -30,6 +30,11 @@
 #include "UserKernelShared.h"
 #include "hdaverb.h"
 
+// kIOMasterPortDefault was deprecated in macOS 12; use kIOMainPortDefault if available.
+#ifndef kIOMainPortDefault
+#define kIOMainPortDefault kIOMasterPortDefault
+#endif
+
 static int compare_path(const void *a, const void *b)
 {
 	return strcmp(a, b);
@@ -42,7 +47,7 @@ static io_string_t *find_services(size_t *count)
 	io_iterator_t iterator;
 	io_string_t *names = NULL;
 	size_t nameCount = 0;
-	kern_return_t kr = IOServiceGetMatchingServices(kIOMasterPortDefault, dict, &iterator);
+	kern_return_t kr = IOServiceGetMatchingServices(kIOMainPortDefault, dict, &iterator);
 	if (kr != KERN_SUCCESS)
 	{
 		fprintf(stderr, "Failed to iterate over ALC services: %08x.\n", kr);
@@ -95,7 +100,7 @@ static io_service_t get_service(const char *name)
 	CFMutableDictionaryRef dict = IOServiceMatching(kALCUserClientProvider);
 
 	io_iterator_t iterator;
-	kern_return_t kr = IOServiceGetMatchingServices(kIOMasterPortDefault, dict, &iterator);
+	kern_return_t kr = IOServiceGetMatchingServices(kIOMainPortDefault, dict, &iterator);
 	if (kr != KERN_SUCCESS)
 	{
 		fprintf(stderr, "Failed to iterate over ALC services: %08x.\n", kr);

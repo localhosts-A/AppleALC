@@ -15,7 +15,7 @@ fi
 if ! command -v alc-verb &> /dev/null
 then
     echo "alc-verb is not installed in path"
-    exit -1
+    exit 1
 fi
 
 echo "Node $2"

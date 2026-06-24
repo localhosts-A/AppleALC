@@ -5,7 +5,7 @@
 #  Created by Rodion Shingarev on 25.03.21.
 #  
 
-outfile=~/Desktop/SupportedСodecs.md
+outfile=~/Desktop/SupportedCodecs.md
 printf '*Thеse tables are generated using [wiki_table.command](https://github.com/acidanthera/AppleALC/blob/master/Tools/wiki_table.command)* \n' > $outfile
 cd "$(dirname "$0")/../Resources/"
 ver=$(grep "MODULE_VERSION =" ../AppleALC.xcodeproj/project.pbxproj | head -1 |  awk '{ print $3 }' | tr -d ";")

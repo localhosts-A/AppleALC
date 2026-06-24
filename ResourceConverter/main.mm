@@ -31,8 +31,16 @@ NSString *ResourceHeader {@"\
 
 static void appendFile(NSString *file, NSString *data) {
 	NSFileHandle *handle = [NSFileHandle fileHandleForUpdatingAtPath:file];
+	if (!handle) {
+		ERROR("Failed to open file for writing: %s", [file UTF8String]);
+	}
 	[handle seekToEndOfFile];
-	[handle writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
+	NSData *encodedData = [data dataUsingEncoding:NSUTF8StringEncoding];
+	if (!encodedData) {
+		[handle closeFile];
+		ERROR("Failed to encode data for file: %s", [file UTF8String]);
+	}
+	[handle writeData:encodedData];
 	[handle closeFile];
 }
 
@@ -196,8 +204,14 @@ namespace std {
 	template <>
 	struct hash<std::vector<uint8_t>> {
 		size_t operator()(const std::vector<uint8_t> &x) const {
-			auto size = x.size();
-			return size ^ (size > 0 ? x[0] : 0xFF);
+			// FNV-1a hash for better distribution and fewer collisions
+			size_t result = 14695981039346656037ULL;
+			for (auto byte : x) {
+				result ^= byte;
+				result *= 1099511628211ULL;
+			}
+			result ^= x.size();
+			return result;
 		}
 	};
 };
